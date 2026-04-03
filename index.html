@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кто ты из героев Dota 2? | Тест на 124 героях</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+        }
+        
+        @keyframes float {
+            from { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            to { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid #e63946;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            box-shadow: 0 0 10px #ffd700;
+        }
+        
+        h1 {
+            font-size: 3em;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #e63946, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(230, 57, 70, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #a8dadc;
+            opacity: 0.9;
+        }
+        
+        .hero-count {
+            display: inline-block;
+            background: rgba(230, 57, 70, 0.2);
+            border: 1px solid #e63946;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .start-screen, .question-screen, .result-screen {
+            display: none;
+        }
+        
+        .start-screen.active, .question-screen.active, .result-screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #e63946, #d62839);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+            font-family: 'Exo 2', sans-serif;
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.6);
+            background: linear-gradient(135deg, #ff4d5a, #e63946);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #457b9d, #1d3557);
+            box-shadow: 0 4px 15px rgba(69, 123, 157, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(69, 123, 157, 0.6);
+            background: linear-gradient(135deg, #5a9ab8, #457b9d);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e63946, #ffd700);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+        }
+        
+        .question-number {
+            color: #ffd700;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .question-text {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            font-weight: 700;
+            line-height: 1.3;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .answer-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-family: 'Exo 2', sans-serif;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-btn:hover {
+            background: rgba(230, 57, 70, 0.2);
+            border-color: #e63946;
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(230, 57, 70, 0.3);
+        }
+        
+        .answer-btn.selected {
+            background: rgba(230, 57, 70, 0.4);
+            border-color: #e63946;
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
+        }
+        
+        .result-hero {
+            text-align: center;
+        }
+        
+        .hero-image-container {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            position: relative;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .hero-image-container:hover .hero-image {
+            transform: scale(1.1);
+        }
+        
+        .hero-image-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+        
+        .hero-placeholder {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+        
+        .hero-name {
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ffd700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+        
+        .hero-title {
+            font-size: 1.3em;
+            color: #a8dadc;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .hero-description {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #e63946;
+            text-align: left;
+            line-height: 1.6;
+        }
+        
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: #a8dadc;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #ffd700;
+        }
+        
+        .restart-btn {
+            margin-top: 30px;
+        }
+        
+        .attribute-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            vertical-align: middle;
+            border-radius: 50%;
+        }
+        
+        .str { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        .agi { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .int { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+        .all { background: linear-gradient(45deg, #ef4444, #22c55e, #3b82f6); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        
+        .hero-icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .mini-hero {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            object-fit: cover;
+        }
+        
+        .mini-hero:hover {
+            transform: scale(1.1);
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        @media (max-width: 600px) {
+            h1 { font-size: 2em; }
+            .question-text { font-size: 1.4em; }
+            .answers-grid { grid-template-columns: 1fr; }
+            .hero-image-container { width: 250px; height: 250px; }
+            .hero-name { font-size: 2em; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+    
+    <div class="container">
+        <header>
+            <h1>⚔️ Dota 2 Quiz</h1>
+            <div class="subtitle">Узнай, кто ты из мира Доты</div>
+            <div class="hero-count">📊 124 героя</div>
+        </header>
+        
+        <div class="quiz-container">
+            <!-- Стартовый экран -->
+            <div class="start-screen active" id="startScreen">
+                <div style="text-align: center; padding: 40px 0;">
+                    <p style="font-size: 1.3em; margin-bottom: 30px; line-height: 1.6;">
+                        Пройди тест из 10 вопросов и узнай, какой герой Dota 2 отражает твою личность!<br><br>
+                        Мы проанализируем твой характер, стиль игры и предпочтения среди <strong>124 уникальных героев</strong>.
+                    </p>
+                    <div style="margin: 30px 0; color: #a8dadc;">
+                        <div>🎮 Сложность: от простых до сложных</div>
+                        <div>🎨 Все роли: от Керри до Саппорта</div>
+                        <div>⚡ Быстрый алгоритм подбора</div>
+                    </div>
+                    <button class="btn" onclick="startQuiz()">Начать тест</button>
+                </div>
+            </div>
+            
+            <!-- Экран вопросов -->
+            <div class="question-screen" id="questionScreen">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="question-number" id="questionNumber">Вопрос 1/10</div>
+                <h2 class="question-text" id="questionText">Загрузка...</h2>
+                <div class="answers-grid" id="answersGrid"></div>
+            </div>
+            
+            <!-- Экран результата -->
+            <div class="result-screen" id="resultScreen">
+                <div class="result-hero">
+                    <div class="hero-image-container" id="heroImageContainer">
+                        <img class="hero-image" id="heroImage" src="" alt="Ваш герой" onerror="handleImageError(this)">
+                    </div>
+                    <h2 class="hero-name" id="heroName"></h2>
+                    <div class="hero-title" id="heroTitle"></div>
+                    
+                    <div class="hero-stats" id="heroStats"></div>
+                    
+                    <div class="hero-description" id="heroDescription"></div>
+                    
+                    <button class="btn restart-btn" onclick="restartQuiz()">Пройти еще раз</button>
+                    <button class="btn btn-secondary" onclick="shareResult()">Поделиться результатом</button>
+                    
+                    <div style="margin-top: 40px; text-align: left;">
+                        <h3 style="color: #ffd700; margin-bottom: 15px; text-align: center;">📚 Все герои в базе:</h3>
+                        <div class="hero-icons-grid" id="heroGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // База данных всех героев Dota 2 (исправлены имена для URL)
+        const heroes = [
+            { name: "abaddon", display: "Abaddon", attr: "str", roles: ["support", "offlane"], complexity: "low", stage: "all", title: "Лорд Аверно", desc: "Ты защитник и хранитель. Как Абаддон, ты предпочитаешь стоять на страже близких, готовый принять удар за них. Твоя сила — в стойкости и способности переживать невзгоды.", icon: "abaddon" },
+            { name: "alchemist", display: "Alchemist", attr: "str", roles: ["carry", "mid"], complexity: "moderate", stage: "late", title: "Алхимик", desc: "Ты амбициозен и целеустремлен. Как Алхимист, ты видишь возможности там, где другие видят проблемы. Ты работаешь на будущее, вкладываясь сейчас для огромной отдачи потом.", icon: "alchemist" },
+            { name: "ancient_apparition", display: "Ancient Apparition", attr: "int", roles: ["support"], complexity: "moderate", stage: "all", title: "Древний Аппариций", desc: "Ты холодный расчет и дальновидность. Твои действия масштабны и влияют на все вокруг. Ты предпочитаешь держать дистанцию, контролируя ситуацию издалека.", icon: "ancient_apparition" },
+            { name: "antimage", display: "Anti-Mage", attr: "agi", roles: ["carry"], complexity: "moderate", stage: "late", title: "Анти-Маг", desc: "Ты независим и целеустремлен. Как Анти-Маг, ты не терпишь чужого контроля и идешь к цели несмотря ни на что. Ты ценишь свободу выше всего.", icon: "antimage" },
+            { name: "arc_warden", display: "Arc Warden", attr: "agi", roles: ["carry", "mid"], complexity: "high", stage: "late", title: "Арк Варден", desc: "Ты сложная натура с множеством граней. Ты умеешь быть в нескольких местах одновременно, умело распределяя внимание. Твой интеллект позволяет контролировать хаос.", icon: "arc_warden" },
+            { name: "axe", display: "Axe", attr: "str", roles: ["offlane", "initiator"], complexity: "low", stage: "mid", title: "Акс", desc: "Ты прямолинеен и агрессивен. Как Акс, ты врываешься в центр событий, не боясь быть в эпицентре внимания. Твоя храбрость вдохновляет окружающих.", icon: "axe" },
+            { name: "bane", display: "Bane", attr: "int", roles: ["support", "mid"], complexity: "moderate", stage: "early", title: "Бэйн", desc: "Ты мастер манипуляций и кошмаров. Ты умеешь обращать силы врагов против них самих. Твое присутствие заставляет врагов дрожать от страха.", icon: "bane" },
+            { name: "batrider", display: "Batrider", attr: "int", roles: ["mid", "offlane"], complexity: "high", stage: "mid", title: "Батрайдер", desc: "Ты любишь зажигать и создавать хаос. Ты быстр, маневрен и непредсказуем. Как Батрайдер, ты хватаешь цель и не отпускаешь до победного конца.", icon: "batrider" },
+            { name: "beastmaster", display: "Beastmaster", attr: "str", roles: ["offlane", "mid"], complexity: "moderate", stage: "mid", title: "Зверовод", desc: "Ты лидер и командир. Ты чувствуешь связь с природой и умеешь управлять теми, кто тебя окружает. Твоя сила в единстве с allies.", icon: "beastmaster" },
+            { name: "bloodseeker", display: "Bloodseeker", attr: "agi", roles: ["carry", "mid"], complexity: "low", stage: "mid", title: "Бладсикер", desc: "Ты хищник и охотник. Как Бладсикер, ты чувствуешь слабость других и не даешь им уйти. Ты неутолим в своих желаниях.", icon: "bloodseeker" },
+            { name: "bounty_hunter", display: "Bounty Hunter", attr: "agi", roles: ["roamer", "support"], complexity: "moderate", stage: "early", title: "Баунти Хантер", desc: "Ты скрытный и хитрый. Ты предпочитаешь действовать из тени, получая выгоду с чужих действий. Твоя информация — твое оружие.", icon: "bounty_hunter" },
+            { name: "brewmaster", display: "Brewmaster", attr: "str", roles: ["offlane", "mid"], complexity: "high", stage: "mid", title: "Брюмастер", desc: "Ты весельчак, но опасный. Как Брюмастер, ты расщепляешься на множество личностей, каждая из которых имеет свою роль. Твоя многогранность сбивает с толку.", icon: "brewmaster" },
+            { name: "bristleback", display: "Bristleback", attr: "str", roles: ["offlane"], complexity: "low", stage: "mid", title: "Бристлбэк", desc: "Ты упрям и стоек. Ты не отступаешь перед лицом опасности, а лишь злишься сильнее. Чем больше тебя бьют, тем сильнее ты становишься.", icon: "bristleback" },
+            { name: "broodmother", display: "Broodmother", attr: "agi", roles: ["mid", "offlane"], complexity: "moderate", stage: "mid", title: "Праматерь", desc: "Ты создатель и разрушитель. Как Брудамма, ты порождаешь массу проблем, заполняя пространство собой. Ты предпочитаешь действовать в одиночку.", icon: "broodmother" },
+            { name: "centaur_warrunner", display: "Centaur Warrunner", attr: "str", roles: ["offlane", "initiator"], complexity: "low", stage: "mid", title: "Кентавр", desc: "Ты неудержимая сила. Как Кентавр, ты сметаешь все на своем пути, используя свою мощь для защиты allies. Твоя стойкость легендарна.", icon: "centaur" },
+            { name: "chaos_knight", display: "Chaos Knight", attr: "str", roles: ["carry"], complexity: "low", stage: "late", title: "Рыцарь Хаоса", desc: "Ты хаос в чистом виде. Ты веришь в удачу и случайность. Как Chaos Knight, ты можешь быть непредсказуемо силен в нужный момент.", icon: "chaos_knight" },
+            { name: "chen", display: "Chen", attr: "int", roles: ["support"], complexity: "high", stage: "early", title: "Чен", desc: "Ты лидер и обращающий. Ты видишь потенциал там, где другие видят врагов. Твоя сила — в способности объединять разрозненных под свое знамя.", icon: "chen" },
+            { name: "clinkz", display: "Clinkz", attr: "agi", roles: ["carry", "mid"], complexity: "moderate", stage: "mid", title: "Клинкз", desc: "Ты призрачный лучник. Быстрый, неуловимый и смертоносный. Ты предпочитаешь действовать в одиночку, поражая цели из ниоткуда.", icon: "clinkz" },
+            { name: "rattletrap", display: "Clockwerk", attr: "str", roles: ["offlane", "roamer"], complexity: "moderate", stage: "mid", title: "Клокверк", desc: "Ты изобретатель и западня. Как Клокверк, ты ловишь врагов в своих сетях, не давая им шанса на побег. Твоя изобретательность граничит с безумием.", icon: "rattletrap" },
+            { name: "crystal_maiden", display: "Crystal Maiden", attr: "int", roles: ["support"], complexity: "low", stage: "early", title: "Кристал Мэйден", desc: "Ты источник маны и холода. Ты поддерживаешь others, обеспечивая их ресурсами. Твоя жертвенность делает команду сильнее.", icon: "crystal_maiden" },
+            { name: "dark_seer", display: "Dark Seer", attr: "int", roles: ["offlane"], complexity: "high", stage: "mid", title: "Темный Сир", desc: "Ты стратег и манипулятор пространством. Как Dark Seer, ты используешь силу врагов против них, создавая иллюзии и хаос.", icon: "dark_seer" },
+            { name: "dark_willow", display: "Dark Willow", attr: "int", roles: ["support", "mid"], complexity: "moderate", stage: "mid", title: "Темная Ива", desc: "Ты хитрая и непредсказуемая. Ты любишь создавать хаос и смеяться над замешательством врагов. Твоя магия — это игра.", icon: "dark_willow" },
+            { name: "dazzle", display: "Dazzle", attr: "int", roles: ["support"], complexity: "low", stage: "all", title: "Дазл", desc: "Ты грань между жизнью и смертью. Как Дазл, ты спасаешь allies в последний момент, смеясь над смертью. Твоя вера непоколебима.", icon: "dazzle" },
+            { name: "death_prophet", display: "Death Prophet", attr: "int", roles: ["mid"], complexity: "moderate", stage: "mid", title: "Пророчица Смерти", desc: "Ты голос извне и разрушительница. Ты предвидишь события и используешь духов для достижения целей. Ты не боишься конца.", icon: "death_prophet" },
+            { name: "disruptor", display: "Disruptor", attr: "int", roles: ["support"], complexity: "moderate", stage: "mid", title: "Дисраптор", desc: "Ты мастер контроля поля боя. Как Дисраптор, ты не даешь врагам сбежать, заставляя их сражаться. Ты диктуешь правила игры.", icon: "disruptor" },
+            { name: "doom_bringer", display: "Doom", attr: "str", roles: ["offlane", "mid"], complexity: "moderate", stage: "mid", title: "Дум", desc: "Ты неотвратимый приговор. Как Дум, ты лишаешь врагов их силы, обрекая их на медленное поражение. Ты — конец всего.", icon: "doom_bringer" },
+            { name: "dragon_knight", display: "Dragon Knight", attr: "str", roles: ["mid", "carry"], complexity: "low", stage: "late", title: "Драконий Рыцарь", desc: "Ты благородный воин. Как ДК, ты сочетаешь защиту и разрушительную мощь. Твоя трансформация в дракона — символ твоего скрытого потенциала.", icon: "dragon_knight" },
+            { name: "drow_ranger", display: "Drow Ranger", attr: "agi", roles: ["carry"], complexity: "low", stage: "mid", title: "Дров Рейнджер", desc: "Ты молчаливая и смертоносная. Как Дровка, ты поражаешь издалека, пока враг не понимает, откуда пришла смерть. Ты холодна и расчетлива.", icon: "drow_ranger" },
+            { name: "earth_spirit", display: "Earth Spirit", attr: "str", roles: ["support", "roamer"], complexity: "high", stage: "early", title: "Спирит Земли", desc: "Ты искусный боевик и защитник. Как Earth Spirit, ты мастерски управляешь позиционированием, спасая allies и губя врагов камнями.", icon: "earth_spirit" },
+            { name: "earthshaker", display: "Earthshaker", attr: "str", roles: ["support", "initiator"], complexity: "moderate", stage: "all", title: "Аркана (Earthshaker)", desc: "Ты создатель землетрясений. Как Шейкер, ты можешь изменить ход боя одним ударом. Твоя сила скрыта до поры до времени.", icon: "earthshaker" },
+            { name: "elder_titan", display: "Elder Titan", attr: "str", roles: ["support", "offlane"], complexity: "high", stage: "mid", title: "Старший Титан", desc: "Ты древний и мудрый. Как Elder Titan, ты видишь суть вещей и раскалываешь миры. Твоя связь с космосом велика.", icon: "elder_titan" },
+            { name: "ember_spirit", display: "Ember Spirit", attr: "agi", roles: ["mid", "carry"], complexity: "high", stage: "late", title: "Эмбер Спирит", desc: "Ты огонь и скорость. Как Эмбер, ты вспыхиваешь ярко и исчезаешь, оставляя лишь пепел. Ты неуловим и смертоносен.", icon: "ember_spirit" },
+            { name: "enchantress", display: "Enchantress", attr: "int", roles: ["support", "jungler"], complexity: "moderate", stage: "early", title: "Чародейка", desc: "Ты милая, но смертоносная. Как Энча, ты обращаешь на свою сторону диких созданий. Твоя невинность обманчива.", icon: "enchantress" },
+            { name: "enigma", display: "Enigma", attr: "all", roles: ["offlane", "jungler"], complexity: "moderate", stage: "all", title: "Энигма", desc: "Ты тайна и пустота. Как Энигма, ты контролируешь гравитацию и создаешь чёрные дыры. Ты заставляешь врагов бояться пустоты.", icon: "enigma" },
+            { name: "faceless_void", display: "Faceless Void", attr: "agi", roles: ["carry"], complexity: "moderate", stage: "late", title: "Фейслесс Войд", desc: "Ты повелитель времени. Как Войд, ты останавливаешь время для others, пока двигаешься сам. Ты независим от времени.", icon: "faceless_void" },
+            { name: "grimstroke", display: "Grimstroke", attr: "int", roles: ["support", "mid"], complexity: "moderate", stage: "mid", title: "Гримстрок", desc: "Ты художник и каратель. Как Гримстрок, ты связываешь судьбы врагов, заставляя их страдать вместе. Твое искусство смертоносно.", icon: "grimstroke" },
+            { name: "gyrocopter", display: "Gyrocopter", attr: "agi", roles: ["carry", "mid"], complexity: "low", stage: "late", title: "Гайрокоптер", desc: "Ты летчик и подрывник. Как Гиро, ты обрушиваешь на врагов шквал огня с небес. Ты любишь мощь и взрывы.", icon: "gyrocopter" },
+            { name: "hoodwink", display: "Hoodwink", attr: "agi", roles: ["support", "mid"], complexity: "moderate", stage: "mid", title: "Худвинк", desc: "Ты хитрая лиса. Как Худвинк, ты запутываешь врагов и поражаешь метким выстрелом. Ты неуловима и коварна.", icon: "hoodwink" },
+            { name: "huskar", display: "Huskar", attr: "str", roles: ["mid", "carry"], complexity: "low", stage: "mid", title: "Хускар", desc: "Ты берсеркер. Как Хускар, ты сильнее, чем ближе к смерти. Ты не боишься жертвовать собой ради победы.", icon: "huskar" },
+            { name: "invoker", display: "Invoker", attr: "int", roles: ["mid"], complexity: "high", stage: "late", title: "Инвокер", desc: "Ты гений и маг. Как Инвокер, ты владеешь десятками заклинаний и комбинаций. Твой интеллект не знает границ, но требует мастерства.", icon: "invoker" },
+            { name: "wisp", display: "Io", attr: "all", roles: ["support"], complexity: "high", stage: "all", title: "Ио (Висп)", desc: "Ты связь и единство. Как Ио, ты неразрывно связан с allies, разделяя боль и радость. Ты — воплощение верности.", icon: "wisp" },
+            { name: "jakiro", display: "Jakiro", attr: "int", roles: ["support", "mid"], complexity: "low", stage: "all", title: "Джакиро", desc: "Ты двойственная природа. Как Джакиро, ты сочетаешь огонь и лед, разрушая все на своем пути. Твоя мощь двойна.", icon: "jakiro" },
+            { name: "juggernaut", display: "Juggernaut", attr: "agi", roles: ["carry"], complexity: "low", stage: "mid", title: "Джаггернаут", desc: "Ты неостановимый воин. Как Джагга, ты несешься вперед, уничтожая врагов. Ты веришь в честный бой.", icon: "juggernaut" },
+            { name: "keeper_of_the_light", display: "Keeper of the Light", attr: "int", roles: ["support"], complexity: "moderate", stage: "all", title: "Кипер Лайт", desc: "Ты мудрец и источник света. Как Котл, ты освещаешь путь allies и испепеляешь врагов. Твоя мудрость велика.", icon: "keeper_of_the_light" },
+            { name: "kunkka", display: "Kunkka", attr: "str", roles: ["mid", "offlane"], complexity: "moderate", stage: "mid", title: "Кунка", desc: "Ты капитан и призрак. Как Кунка, ты управляешь приливами и отливами, наводя ужас на врагов. Твоя команда — твоя семья.", icon: "kunkka" },
+            { name: "legion_commander", display: "Legion Commander", attr: "str", roles: ["offlane", "mid"], complexity: "low", stage: "mid", title: "Легионка", desc: "Ты командир и дуэлянт. Как Легионка, ты бросаешь вызов сильнейшим и побеждаешь, растя с каждой победой.", icon: "legion_commander" },
+            { name: "leshrac", display: "Leshrac", attr: "int", roles: ["mid", "carry"], complexity: "moderate", stage: "all", title: "Лешрак", desc: "Ты разрушитель миров. Как Лешрак, ты неудержимый источник разрушения, сжигающий все вокруг молниями.", icon: "leshrac" },
+            { name: "lich", display: "Lich", attr: "int", roles: ["support"], complexity: "low", stage: "early", title: "Лич", desc: "Ты холодная нежить. Как Лич, ты питаешься others и замораживаешь врагов. Ты прагматичен и жесток.", icon: "lich" },
+            { name: "life_stealer", display: "Lifestealer", attr: "str", roles: ["carry"], complexity: "moderate", stage: "late", title: "Лайфстилер", desc: "Ты паразит и чудовище. Как ЛС, ты прячешься внутри allies, чтобы внезапно вырваться и пожирать врагов.", icon: "life_stealer" },
+            { name: "lina", display: "Lina", attr: "int", roles: ["mid", "support"], complexity: "low", stage: "all", title: "Лина", desc: "Ты огненная ведьма. Как Лина, ты взрываешь врагов огнем и светом. Ты горяча и непредсказуема.", icon: "lina" },
+            { name: "lion", display: "Lion", attr: "int", roles: ["support"], complexity: "low", stage: "all", title: "Лион", desc: "Ты демон и маг. Как Лион, ты крадешь ману и уничтожаешь врагов пальцем смерти. Ты расчетлив и опасен.", icon: "lion" },
+            { name: "lone_druid", display: "Lone Druid", attr: "agi", roles: ["carry"], complexity: "high", stage: "late", title: "Лон Друид", desc: "Ты отшельник с медведем. Как ЛД, ты ценишь одиночество и силу природы. Ты и твой компаньон неразлучны.", icon: "lone_druid" },
+            { name: "luna", display: "Luna", attr: "agi", roles: ["carry"], complexity: "low", stage: "late", title: "Луна", desc: "Ты скачешь по луне. Как Луна, ты быстра и смертоносна, освещая ночь лучами. Ты веришь в свет во тьме.", icon: "luna" },
+            { name: "lycan", display: "Lycan", attr: "all", roles: ["carry", "pusher"], complexity: "moderate", stage: "mid", title: "Ликан", desc: "Ты волк и вожак. Как Ликан, ты ведешь стаю и разрываешь врагов клыками. Ты дик и свободолюбив.", icon: "lycan" },
+            { name: "magnataur", display: "Magnus", attr: "str", roles: ["offlane", "initiator"], complexity: "moderate", stage: "mid", title: "Магнус", desc: "Ты магнитная сила. Как Магнус, ты притягиваешь врагов и сокрушаешь их. Твой ультимейт — кошмар команды.", icon: "magnataur" },
+            { name: "marci", display: "Marci", attr: "all", roles: ["carry", "support"], complexity: "moderate", stage: "mid", title: "Марси", desc: "Ты верный защитник. Как Марси, ты защищаешь тех, кого любишь, с нечеловеческой силой. Твоя преданность безгранична.", icon: "marci" },
+            { name: "mars", display: "Mars", attr: "str", roles: ["offlane"], complexity: "moderate", stage: "mid", title: "Марс", desc: "Ты бог войны. Как Марс, ты строишь арену и сражаешься в честном бою. Ты горд и непобедим в своем царстве.", icon: "mars" },
+            { name: "medusa", display: "Medusa", attr: "agi", roles: ["carry"], complexity: "low", stage: "late", title: "Медуза", desc: "Ты змееголовая горгона. Как Медуза, ты обращаешь врагов в камень одним взглядом. Ты непобедима в поздней игре.", icon: "medusa" },
+            { name: "meepo", display: "Meepo", attr: "agi", roles: ["carry"], complexity: "high", stage: "mid", title: "Мипо", desc: "Ты один, но вас много. Как Мипо, ты контролируешь множество клонов, заполняя карту. Твоя многозадачность — легенда.", icon: "meepo" },
+            { name: "mirana", display: "Mirana", attr: "agi", roles: ["support", "mid"], complexity: "moderate", stage: "all", title: "Мирана", desc: "Ты принцесса луны. Как Мирана, ты грациозна и смертоносна, стреляя стрелами и прыгая по небу. Ты элегантна.", icon: "mirana" },
+            { name: "monkey_king", display: "Monkey King", attr: "agi", roles: ["carry", "mid"], complexity: "high", stage: "mid", title: "Манки Кинг", desc: "Ты король обезьян. Как МК, ты прыгаешь по деревьям и создаешь армию клонов. Ты хитер и весел.", icon: "monkey_king" },
+            { name: "morphling", display: "Morphling", attr: "agi", roles: ["carry", "mid"], complexity: "high", stage: "late", title: "Морфлинг", desc: "Ты вода и адаптация. Как Морф, ты меняешь форму, подстраиваясь под любую ситуацию. Ты неуловим и изменчив.", icon: "morphling" },
+            { name: "muerta", display: "Muerta", attr: "agi", roles: ["carry", "mid"], complexity: "moderate", stage: "late", title: "Муэрта", desc: "Ты мертвая, но мстительная. Как Муэрта, ты возвращаешься из мертвых, чтобы наказать живых. Твоя красота смертоносна.", icon: "muerta" },
+            { name: "naga_siren", display: "Naga Siren", attr: "agi", roles: ["carry"], complexity: "high", stage: "late", title: "Нага Сирена", desc: "Ты морская певица. Как Нага, ты засылаешь врагов в сон иллюзий, а сама разрушаешь базы. Ты властна над иллюзиями.", icon: "naga_siren" },
+            { name: "furion", display: "Nature's Prophet", attr: "int", roles: ["offlane", "jungler"], complexity: "moderate", stage: "all", title: "Фурион", desc: "Ты отец природы. Как Фурион, ты призываешь деревья и телепортируешься. Ты разрушаешь базы, пока враги спят.", icon: "furion" },
+            { name: "necrolyte", display: "Necrophos", attr: "int", roles: ["mid", "offlane"], complexity: "low", stage: "mid", title: "Некрофос", desc: "Ты чума и болезнь. Как Некро, ты высасываешь жизнь и запрещаешь воскрешение. Ты неизлечим.", icon: "necrolyte" },
+            { name: "night_stalker", display: "Night Stalker", attr: "str", roles: ["offlane", "mid"], complexity: "low", stage: "early", title: "Найт Сталкер", desc: "Ты хищник ночи. Как НС, ты силен во тьме и слаб на свету. Ты правишь ночью, наводя ужас.", icon: "night_stalker" },
+            { name: "nyx_assassin", display: "Nyx Assassin", attr: "int", roles: ["roamer", "mid"], complexity: "moderate", stage: "early", title: "Никс Ассасин", desc: "Ты жук-убийца. Как Никс, ты врываешься из невидимости и оглушаешь. Ты мстишь за ультимейт.", icon: "nyx_assassin" },
+            { name: "ogre_magi", display: "Ogre Magi", attr: "str", roles: ["support", "mid"], complexity: "low", stage: "all", title: "Огр Маг", desc: "Ты два головы — два мозга (нет). Как Огр, ты случаен и весел, но мультикаст делает тебя легендой. Ты везучий дуралей.", icon: "ogre_magi" },
+            { name: "omniknight", display: "Omniknight", attr: "str", roles: ["support", "offlane"], complexity: "low", stage: "early", title: "Омнинайт", desc: "Ты священник и защитник. Как Омни, ты исцеляешь allies и делаешь их неуязвимыми. Ты — щит веры.", icon: "omniknight" },
+            { name: "oracle", display: "Oracle", attr: "int", roles: ["support"], complexity: "high", stage: "all", title: "Оракл", desc: "Ты провидец и манипулятор судьбой. Как Оракл, ты лечишь и калечишь одним заклинанием. Твои предсказания неумолимы.", icon: "oracle" },
+            { name: "obsidian_destroyer", display: "Outworld Destroyer", attr: "int", roles: ["mid"], complexity: "moderate", stage: "late", title: "Астрал (ОД)", desc: "Ты разрушитель разума. Как ОД, ты крадешь интеллект и уничтожаешь маной. Ты чужд этому миру.", icon: "obsidian_destroyer" },
+            { name: "pangolier", display: "Pangolier", attr: "all", roles: ["mid", "offlane"], complexity: "moderate", stage: "mid", title: "Панголир", desc: "Ты романтик и фехтовальщик. Как Панго, ты крутишься и прыгаешь, уклоняясь от всего. Ты неуловим как шар.", icon: "pangolier" },
+            { name: "phantom_assassin", display: "Phantom Assassin", attr: "agi", roles: ["carry"], complexity: "low", stage: "late", title: "Фантом Ассасин", desc: "Ты тень и крит. Как ПА, ты появляешься из ниоткуда и убиваешь одним ударом. Ты смерть во плоти.", icon: "phantom_assassin" },
+            { name: "phantom_lancer", display: "Phantom Lancer", attr: "agi", roles: ["carry"], complexity: "moderate", stage: "late", title: "Фантом Лансер", desc: "Ты армия одного человека. Как ПЛ, ты создаешь бесконечные иллюзии, заполняя поле боя. Никто не знает, где ты настоящий.", icon: "phantom_lancer" },
+            { name: "phoenix", display: "Phoenix", attr: "all", roles: ["support", "offlane"], complexity: "moderate", stage: "mid", title: "Феникс", desc: "Ты бессмертная птица. Как Феникс, ты жертвуешь собой, чтобы возродиться из пепла. Твоя жертвенность велика.", icon: "phoenix" },
+            { name: "primal_beast", display: "Primal Beast", attr: "str", roles: ["offlane"], complexity: "low", stage: "mid", title: "Праймал Бист", desc: "Ты дикое чудовище. Как Праймал, ты разрушаешь все на своем пути, не зная остановки. Ты первобытная ярость.", icon: "primal_beast" },
+            { name: "puck", display: "Puck", attr: "int", roles: ["mid"], complexity: "high", stage: "all", title: "Пак", desc: "Ты хитрый дракончик. Как Пак, ты уклоняешься от всего и создаешь иллюзии. Ты играешь с врагами, как с куклами.", icon: "puck" },
+            { name: "pudge", display: "Pudge", attr: "str", roles: ["support", "offlane"], complexity: "low", stage: "all", title: "Пудж", desc: "Ты мясник и любимец публики. Как Пудж, ты ловишь врагов крюком и перевариваешь их. Ты жирный и ужасный, но все любят тебя.", icon: "pudge" },
+            { name: "pugna", display: "Pugna", attr: "int", roles: ["mid", "support"], complexity: "moderate", stage: "mid", title: "Пугна", desc: "Ты древний некромант. Как Пугна, ты разрушаешь здания и крадешь жизнь. Ты хрупок, но смертоносен.", icon: "pugna" },
+            { name: "queenofpain", display: "Queen of Pain", attr: "int", roles: ["mid"], complexity: "moderate", stage: "mid", title: "Квопа", desc: "Ты королева боли. Как Квопа, ты портишь врагам жизнь криками и молниями. Ты садистка и наслаждаешься страданиями.", icon: "queenofpain" },
+            { name: "razor", display: "Razor", attr: "agi", roles: ["carry", "offlane"], complexity: "low", stage: "mid", title: "Рейзор", desc: "Ты молния и скорость. Как Рейзор, ты высасываешь урон и бегаешь быстро. Ты электрический убийца.", icon: "razor" },
+            { name: "riki", display: "Riki", attr: "agi", roles: ["carry", "roamer"], complexity: "low", stage: "mid", title: "Рики", desc: "Ты невидимый убийца. Как Рики, ты исчезаешь в дымке и режешь спины. Ты трус, но эффективен.", icon: "riki" },
+            { name: "ringmaster", display: "Ringmaster", attr: "all", roles: ["support"], complexity: "moderate", stage: "all", title: "Рингмастер", desc: "Ты директор цирка. Как Рингмастер, ты управляешь шоу, используя реквизит для контроля. Ты артист и манипулятор.", icon: "ringmaster" },
+            { name: "rubick", display: "Rubick", attr: "int", roles: ["support", "mid"], complexity: "high", stage: "all", title: "Рубик", desc: "Ты вор магии. Как Рубик, ты крадешь способности врагов и используешь их против них. Ты гений и адаптивен.", icon: "rubick" },
+            { name: "sand_king", display: "Sand King", attr: "str", roles: ["initiator", "jungler"], complexity: "moderate", stage: "mid", title: "Сэнд Кинг", desc: "Ты король песков. Как СК, ты прячешься в земле и выскакиваешь с эпицентром. Ты мастер засад.", icon: "sand_king" },
+            { name: "shadow_demon", display: "Shadow Demon", attr: "int", roles: ["support"], complexity: "high", stage: "early", title: "Шэдоу Демон", desc: "Ты демон и разрушитель душ. Как СД, ты раздваиваешь врагов и ослабляешь их. Ты коварен и опасен.", icon: "shadow_demon" },
+            { name: "nevermore", display: "Shadow Fiend", attr: "agi", roles: ["mid"], complexity: "moderate", stage: "mid", title: "Невермор (СФ)", desc: "Ты собиратель душ. Как СФ, ты становишься сильнее с каждой смертью. Ты темен и мощен, но требует скилла.", icon: "nevermore" },
+            { name: "shadow_shaman", display: "Shadow Shaman", attr: "int", roles: ["support"], complexity: "low", stage: "mid", title: "Шэдоу Шаман", desc: "Ты заклинатель змей. Как Шаман, ты связываешь врагов и превращаешь их в цыплят. Твои змеи разрушают базы.", icon: "shadow_shaman" },
+            { name: "silencer", display: "Silencer", attr: "int", roles: ["mid", "support"], complexity: "moderate", stage: "late", title: "Сайленсер", desc: "Ты глушитель магии. Как Сайленсер, ты лишаешь врагов слов и крадешь интеллект. Ты ненавидишь заклинания.", icon: "silencer" },
+            { name: "skywrath_mage", display: "Skywrath Mage", attr: "int", roles: ["support", "mid"], complexity: "low", stage: "early", title: "Скайврат Мейдж", desc: "Ты маг небес. Как Скай, ты заливаешь врагов магией с небес. Ты мстишь за любовь.", icon: "skywrath_mage" },
+            { name: "slardar", display: "Slardar", attr: "str", roles: ["offlane", "initiator"], complexity: "low", stage: "mid", title: "Слардар", desc: "Ты рыбина и страж. Как Слардар, ты раскрываешь невидимых и оглушаешь. Ты глубоководный ужас.", icon: "slardar" },
+            { name: "slark", display: "Slark", attr: "agi", roles: ["carry"], complexity: "moderate", stage: "mid", title: "Сларк", desc: "Ты рыбка-убийца. Как Сларк, ты вырываешься из любых оков и крадешь статы. Ты неуловим и растешь с каждой дракой.", icon: "slark" },
+            { name: "snapfire", display: "Snapfire", attr: "all", roles: ["support", "mid"], complexity: "moderate", stage: "all", title: "Снепфайр", desc: "Ты бабка с печеньем и дробовиком. Как Снепфайр, ты весела и смертоносна. Твоя черепаха стреляет снарядами.", icon: "snapfire" },
+            { name: "sniper", display: "Sniper", attr: "agi", roles: ["carry", "mid"], complexity: "low", stage: "late", title: "Снайпер", desc: "Ты карлик с винтовкой. Как Снайпер, ты стреляешь далеко и больно, прячась за allies. Ты трус, но меток.", icon: "sniper" },
+            { name: "spectre", display: "Spectre", attr: "agi", roles: ["carry"], complexity: "moderate", stage: "late", title: "Спектра", desc: "Ты призрак и отражение. Как Спектра, ты всегда рядом с врагами, несмотря на дистанцию. Ты неизбежна в лейте.", icon: "spectre" },
+            { name: "spirit_breaker", display: "Spirit Breaker", attr: "str", roles: ["roamer", "offlane"], complexity: "low", stage: "all", title: "Спирит Брейкер", desc: "Ты пробиватель. Как Баратрум, ты заряжаешься на врага сквозь стены. Ты не остановишься, пока не убьешь.", icon: "spirit_breaker" },
+            { name: "storm_spirit", display: "Storm Spirit", attr: "int", roles: ["mid"], complexity: "high", stage: "mid", title: "Шторм Спирит", desc: "Ты шаровая молния. Как Шторм, ты летаешь по карте со скоростью света. Ты неудержим, пока есть мана.", icon: "storm_spirit" },
+            { name: "sven", display: "Sven", attr: "str", roles: ["carry"], complexity: "low", stage: "late", title: "Свен", desc: "Ты рыцарь в розовом (когда-то). Как Свен, ты сильнейший керри с клепом. Ты честен и мощен.", icon: "sven" },
+            { name: "techies", display: "Techies", attr: "int", roles: ["support"], complexity: "high", stage: "all", title: "Течис", desc: "Ты сапер и тролль. Как Течис, ты ставишь мины и взрываешь все вокруг. Ты раздражаешь врагов до слез.", icon: "techies" },
+            { name: "templar_assassin", display: "Templar Assassin", attr: "agi", roles: ["mid"], complexity: "moderate", stage: "mid", title: "Темпларка", desc: "Ты ассасин и псионик. Как ТА, ты скрываешься от урона и наносишь огромный крит. Ты загадочна и опасна.", icon: "templar_assassin" },
+            { name: "terrorblade", display: "Terrorblade", attr: "agi", roles: ["carry"], complexity: "moderate", stage: "late", title: "Террорблэйд", desc: "Ты демон и иллюзионист. Как ТБ, ты меняешься здоровьем с врагом и создаешь армию клонов. Ты красив и ужасен.", icon: "terrorblade" },
+            { name: "tidehunter", display: "Tidehunter", attr: "str", roles: ["offlane", "initiator"], complexity: "low", stage: "mid", title: "Тайдхантер", desc: "Ты левиафан. Как Тайд, ты поглощаешь магию и оглушаешь всех вокруг. Ты якорь команды.", icon: "tidehunter" },
+            { name: "shredder", display: "Timbersaw", attr: "str", roles: ["offlane"], complexity: "moderate", stage: "mid", title: "Тимберсоу", desc: "Ты бревно с бензопилой. Как Тимба, ты летаешь по деревьям и разрушаешь все вокруг. Ты боишься деревьев (ирония).", icon: "shredder" },
+            { name: "tinker", display: "Tinker", attr: "int", roles: ["mid"], complexity: "high", stage: "late", title: "Тинкер", desc: "Ты изобретатель и спаммер. Как Тинкер, ты перезаряжаешься на базе и возвращаешься с волной снарядов. Ты не останавливаешься никогда.", icon: "tinker" },
+            { name: "tiny", display: "Tiny", attr: "str", roles: ["mid", "offlane"], complexity: "moderate", stage: "mid", title: "Тини", desc: "Ты каменный великан. Как Тини, ты растешь и становишься сильнее, метая врагов в allies. Ты прост, но разрушителен.", icon: "tiny" },
+            { name: "treant", display: "Treant Protector", attr: "str", roles: ["support"], complexity: "low", stage: "all", title: "Трент", desc: "Ты защитник леса. Как Трент, ты лечишь allies и делаешь их невидимыми. Ты спокоен и мудр.", icon: "treant" },
+            { name: "troll_warlord", display: "Troll Warlord", attr: "agi", roles: ["carry"], complexity: "low", stage: "late", title: "Троль Варлорд", desc: "Ты тролль и berserker. Как Троль, ты бьешь быстро и сильно, не останавливаясь. Ты яростен и упрям.", icon: "troll_warlord" },
+            { name: "tusk", display: "Tusk", attr: "str", roles: ["roamer", "offlane"], complexity: "moderate", stage: "mid", title: "Таск", desc: "Ты морж и драчун. Как Таск, ты замораживаешь врагов снежками и запускаешь их вверх. Ты весел и опасен.", icon: "tusk" },
+            { name: "abyssal_underlord", display: "Underlord", attr: "str", roles: ["offlane"], complexity: "low", stage: "mid", title: "Андерлорд", desc: "Ты повелитель бездны. Как Андерлорд, ты телепортируешь команду и сжигаешь врагов. Ты надежен.", icon: "abyssal_underlord" },
+            { name: "undying", display: "Undying", attr: "str", roles: ["support", "offlane"], complexity: "low", stage: "early", title: "Андайинг", desc: "Ты зомби и гнилушка. Как Зомби, ты крадешь силу и призываешь толпу. Ты воняешь, но полезен.", icon: "undying" },
+            { name: "ursa", display: "Ursa", attr: "agi", roles: ["carry"], complexity: "low", stage: "mid", title: "Урса", desc: "Ты медведь. Как Урса, ты быстро набираешь силу ударов и рвешь врагов когтями. Ты лесной хищник.", icon: "ursa" },
+            { name: "vengefulspirit", display: "Vengeful Spirit", attr: "agi", roles: ["support", "roamer"], complexity: "low", stage: "all", title: "Венга", desc: "Ты дух мести. Как Венга, ты жертвуешь собой, чтобы усилить allies. Твоя месть страшна.", icon: "vengefulspirit" },
+            { name: "venomancer", display: "Venomancer", attr: "agi", roles: ["support", "offlane"], complexity: "low", stage: "all", title: "Веник (Веном)", desc: "Ты ядовитый червь. Как Веном, ты отравляешь все вокруг, замедляя и убивая медленно. Ты противен.", icon: "venomancer" },
+            { name: "viper", display: "Viper", attr: "agi", roles: ["mid", "carry"], complexity: "low", stage: "mid", title: "Вайпер", desc: "Ты ядовитый дракон. Как Вайпер, ты замедляешь и травишь врагов, не давая им уйти. Ты токсичен.", icon: "viper" },
+            { name: "visage", display: "Visage", attr: "int", roles: ["support", "mid"], complexity: "high", stage: "mid", title: "Визаж", desc: "Ты страж и призыватель гаргулий. Как Визаж, ты контролируешь familiars и наносишь огромный урон. Ты хранитель.", icon: "visage" },
+            { name: "void_spirit", display: "Void Spirit", attr: "int", roles: ["mid"], complexity: "high", stage: "mid", title: "Войд Спирит", desc: "Ты дух пустоты. Как Войд Спирит, ты телепортируешься и создаешь взрывы. Ты философ и воин.", icon: "void_spirit" },
+            { name: "warlock", display: "Warlock", attr: "int", roles: ["support"], complexity: "low", stage: "late", title: "Варлок", desc: "Ты чернокнижник. Как Варлок, ты призываешь голема и связываешь врагов. Твоя ультимейт решает бои.", icon: "warlock" },
+            { name: "weaver", display: "Weaver", attr: "agi", roles: ["carry"], complexity: "moderate", stage: "late", title: "Вивер", desc: "Ты жук из времени. Как Вивер, ты откатываешь время назад и стреляешь жуками. Ты неуловим.", icon: "weaver" },
+            { name: "windrunner", display: "Windranger", attr: "agi", roles: ["mid", "support"], complexity: "moderate", stage: "all", title: "Виндранер", desc: "Ты лучница и ветер. Как ВР, ты оглушаешь двоих стрелой и бежишь быстро. Ты свободолюбива.", icon: "windrunner" },
+            { name: "winter_wyvern", display: "Winter Wyvern", attr: "int", roles: ["support"], complexity: "moderate", stage: "all", title: "Винтер Виверна", desc: "Ты ледяная виверна. Как ВВ, ты замораживаешь allies, чтобы защитить их, и заставляешь врагов драться друг с другом.", icon: "winter_wyvern" },
+            { name: "witch_doctor", display: "Witch Doctor", attr: "int", roles: ["support"], complexity: "low", stage: "all", title: "ВД (Вич Доктор)", desc: "Ты шаман и танцор. Как ВД, ты лечишь каналом и оглушаешь котелком. Ты весел и полезен.", icon: "witch_doctor" },
+            { name: "skeleton_king", display: "Wraith King", attr: "str", roles: ["carry"], complexity: "low", stage: "mid", title: "Врайт Кинг (Скелетон Кинг)", desc: "Ты король скелетов. Как ВК, ты воскресаешь после смерти и критуешь. Ты прост и неубиваем.", icon: "skeleton_king" },
+            { name: "zuus", display: "Zeus", attr: "int", roles: ["mid"], complexity: "low", stage: "mid", title: "Зевс", desc: "Ты бог грома. Как Зевс, ты бьешь молниями всех на карте. Ты ненавидишь невидимок.", icon: "zuus" }
+        ];
+
+        // Вопросы теста
+        const questions = [
+            {
+                text: "Какой атрибут тебе ближе всего?",
+                options: [
+                    { text: "💪 Сила — выносливость и мощь", attr: "str" },
+                    { text: "⚡ Ловкость — скорость и точность", attr: "agi" },
+                    { text: "🧠 Интеллект — магия и знания", attr: "int" },
+                    { text: "🌟 Универсальность — все и сразу", attr: "all" }
+                ]
+            },
+            {
+                text: "Какую роль ты предпочитаешь в жизни?",
+                options: [
+                    { text: "⭐ Лидер и основной урон (Керри)", roles: ["carry"] },
+                    { text: "🛡️ Защитник и инициатор (Оффлейн)", roles: ["offlane"] },
+                    { text: "⚖️ Контроль и магия (Мид)", roles: ["mid"] },
+                    { text: "💚 Помощь и поддержка (Саппорт)", roles: ["support"] },
+                    { text: "🔍 Разведка и активность (Роумер)", roles: ["roamer"] }
+                ]
+            },
+            {
+                text: "Когда ты раскрываешься полностью?",
+                options: [
+                    { text: "🌅 С самого начала (Early Game)", stage: "early" },
+                    { text: "🌇 В середине пути (Mid Game)", stage: "mid" },
+                    { text: "🌃 В конце, когда все решается (Late Game)", stage: "late" },
+                    { text: "🌅 Всегда одинаково силен (All Game)", stage: "all" }
+                ]
+            },
+            {
+                text: "Насколько сложен твой характер?",
+                options: [
+                    { text: "😊 Простой и понятный (Легкий)", complexity: "low" },
+                    { text: "😐 Средний, со своими нюансами", complexity: "moderate" },
+                    { text: "😈 Сложный, многослойный (Сложный)", complexity: "high" }
+                ]
+            },
+            {
+                text: "Что для тебя главное в команде?",
+                options: [
+                    { text: "💀 Уничтожать врагов (Дамаг)", type: "damage" },
+                    { text: "🛡️ Защищать allies (Танк/Сейв)", type: "save" },
+                    { text: "🎭 Контролировать ситуацию (Контроль)", type: "control" },
+                    { text: "🚀 Помогать команде двигаться (Утилити)", type: "utility" }
+                ]
+            },
+            {
+                text: "Какой элемент тебе ближе?",
+                options: [
+                    { text: "🔥 Огонь и разрушение", element: "fire" },
+                    { text: "❄️ Лед и холод", element: "ice" },
+                    { text: "⚡ Молния и скорость", element: "lightning" },
+                    { text: "🌑 Тьма и тени", element: "dark" },
+                    { text: "🌿 Природа и жизнь", element: "nature" }
+                ]
+            },
+            {
+                text: "Твой подход к проблемам?",
+                options: [
+                    { text: "💥 Прямолинейный и агрессивный", style: "aggressive" },
+                    { text: "🎭 Хитрый и изворотливый", style: "tricky" },
+                    { text: "🧘 Спокойный и расчетливый", style: "calm" },
+                    { text: "🎪 Непредсказуемый и хаотичный", style: "chaotic" }
+                ]
+            },
+            {
+                text: "Как часто ты рискуешь?",
+                options: [
+                    { text: "🎲 Всегда, жизнь — это игра", risk: "high" },
+                    { text: "⚖️ Иногда, когда нужно", risk: "medium" },
+                    { text: "🛡️ Никогда, только проверенные пути", risk: "low" }
+                ]
+            },
+            {
+                text: "Где ты чувствуешь себя как рыба в воде?",
+                options: [
+                    { text: "🏙️ В шумном городе (Линия)", place: "lane" },
+                    { text: "🌲 В лесу в одиночестве (Лес)", place: "jungle" },
+                    { text: "🌊 Везде, где есть действие (Роум)", place: "roam" },
+                    { text: "🏠 Дома, среди близких (База)", place: "base" }
+                ]
+            },
+            {
+                text: "Какой тип игры тебе ближе?",
+                options: [
+                    { text: "⚔️ Solo — я один против всех", solo: true },
+                    { text: "👥 Team — вместе мы сила", team: true }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+
+        // Создание частиц на фоне
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('questionScreen').classList.add('active');
+            currentQuestion = 0;
+            userAnswers = [];
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Вопрос ${currentQuestion + 1}/${questions.length}`;
+            document.getElementById('questionText').textContent = q.text;
+            
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            const grid = document.getElementById('answersGrid');
+            grid.innerHTML = '';
+            
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = opt.text;
+                btn.onclick = () => selectAnswer(idx);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(idx) {
+            userAnswers.push(idx);
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function calculateHero() {
+            // Система подсчета баллов для каждого героя
+            const scores = {};
+            heroes.forEach(h => scores[h.name] = 0);
+            
+            // Проходим по ответам и добавляем баллы
+            userAnswers.forEach((answerIdx, qIdx) => {
+                const q = questions[qIdx];
+                const ans = q.options[answerIdx];
+                
+                heroes.forEach(hero => {
+                    let points = 0;
+                    
+                    // Проверка атрибута
+                    if (ans.attr && hero.attr === ans.attr) points += 15;
+                    
+                    // Проверка роли
+                    if (ans.roles && ans.roles.some(r => hero.roles.includes(r))) points += 12;
+                    
+                    // Проверка сложности
+                    if (ans.complexity && hero.complexity === ans.complexity) points += 8;
+                    
+                    // Проверка стадии игры
+                    if (ans.stage && hero.stage === ans.stage) points += 10;
+                    
+                    // Дополнительные баллы за совпадение стиля
+                    if (qIdx === 6) { // Вопрос о стиле
+                        if (ans.style === "aggressive" && (hero.roles.includes("initiator") || hero.attr === "str")) points += 8;
+                        if (ans.style === "tricky" && (hero.complexity === "high" || hero.name === "riki")) points += 8;
+                        if (ans.style === "calm" && (hero.roles.includes("support") || hero.name === "treant")) points += 8;
+                        if (ans.style === "chaotic" && (hero.name === "techies" || hero.name === "ogre_magi")) points += 8;
+                    }
+                    
+                    // Элементы
+                    if (ans.element) {
+                        const elementMap = {
+                            "fire": ["lina", "jakiro", "ember_spirit", "phoenix"],
+                            "ice": ["crystal_maiden", "lich", "winter_wyvern", "ancient_apparition"],
+                            "lightning": ["zuus", "razor", "storm_spirit", "disruptor"],
+                            "dark": ["nevermore", "enigma", "night_stalker", "terrorblade"],
+                            "nature": ["furion", "enchantress", "treant", "lone_druid"]
+                        };
+                        if (elementMap[ans.element] && elementMap[ans.element].includes(hero.name)) points += 10;
+                    }
+                    
+                    scores[hero.name] += points;
+                });
+            });
+            
+            // Небольшой случайный фактор для разнообразия при равных
+            heroes.forEach(h => {
+                scores[h.name] += Math.random() * 5;
+            });
+            
+            // Находим победителя
+            let maxScore = -1;
+            let winner = null;
+            
+            for (let heroName in scores) {
+                if (scores[heroName] > maxScore) {
+                    maxScore = scores[heroName];
+                    winner = heroes.find(h => h.name === heroName);
+                }
+            }
+            
+            return winner;
+        }
+
+        function getHeroImageUrl(heroName) {
+            // Используем несколько CDN для надежности
+            const cdns = [
+                `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${heroName}.png`,
+                `https://cdn.dota2.com/apps/dota2/images/heroes/${heroName}_full.png`,
+                `https://raw.githubusercontent.com/odota/dotaconstants/master/build/assets/images/heroes/${heroName}.png`
+            ];
+            return cdns[0]; // Первый CDN (самый надежный)
+        }
+
+        function handleImageError(img) {
+            // Если картинка не загрузилась, показываем иконку
+            const container = document.getElementById('heroImageContainer');
+            const heroName = document.getElementById('heroName').textContent;
+            
+            container.innerHTML = `
+                <div class="hero-image-error">
+                    <div class="hero-placeholder">⚔️</div>
+                    <div>${heroName}</div>
+                </div>
+            `;
+        }
+
+        function showResult() {
+            document.getElementById('questionScreen').classList.remove('active');
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const hero = calculateHero();
+            
+            document.getElementById('heroImage').src = getHeroImageUrl(hero.icon);
+            document.getElementById('heroName').textContent = hero.display;
+            document.getElementById('heroTitle').textContent = hero.title;
+            document.getElementById('heroDescription').innerHTML = `<strong>Описание:</strong> ${hero.desc}<br><br><strong>Тип:</strong> ${getAttrName(hero.attr)} | <strong>Роли:</strong> ${hero.roles.join(", ")}`;
+            
+            // Статистика
+            const stats = document.getElementById('heroStats');
+            stats.innerHTML = `
+                <div class="stat">
+                    <div class="stat-label">Сложность</div>
+                    <div class="stat-value">${getComplexity(hero.complexity)}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Стадия</div>
+                    <div class="stat-value">${getStage(hero.stage)}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Атрибут</div>
+                    <div class="stat-value"><span class="attribute-icon ${hero.attr}"></span></div>
+                </div>
+            `;
+            
+            // Заполняем сетку всех героев
+            const heroGrid = document.getElementById('heroGrid');
+            heroGrid.innerHTML = '';
+            heroes.forEach(h => {
+                const img = document.createElement('img');
+                img.className = 'mini-hero';
+                img.src = getHeroImageUrl(h.icon);
+                img.alt = h.display;
+                img.title = h.display;
+                img.onerror = function() { this.style.display = 'none'; };
+                heroGrid.appendChild(img);
+            });
+            
+            // Конфетти для красоты
+            createConfetti();
+        }
+
+        function getAttrName(attr) {
+            const names = { str: "Сила", agi: "Ловкость", int: "Интеллект", all: "Универсал" };
+            return names[attr] || attr;
+        }
+
+        function getComplexity(c) {
+            return { low: "★☆☆", moderate: "★★☆", high: "★★★" }[c];
+        }
+
+        function getStage(s) {
+            return { early: "Ранняя", mid: "Середина", late: "Поздняя", all: "Все" }[s];
+        }
+
+        function restartQuiz() {
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+        }
+
+        function shareResult() {
+            const heroName = document.getElementById('heroName').textContent;
+            const text = `Я прошел тест "Кто ты из Dota 2?" и получил: ${heroName}! Узнай своего героя тут: ${window.location.href}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Мой герой Dota 2',
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Результат скопирован в буфер обмена!');
+                });
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#e63946', '#ffd700', '#457b9d', '#f1faee'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const conf = document.createElement('div');
+                    conf.style.position = 'fixed';
+                    conf.style.width = '10px';
+                    conf.style.height = '10px';
+                    conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    conf.style.left = Math.random() * 100 + 'vw';
+                    conf.style.top = '-10px';
+                    conf.style.borderRadius = '50%';
+                    conf.style.zIndex = '9999';
+                    conf.style.pointerEvents = 'none';
+                    document.body.appendChild(conf);
+                    
+                    const anim = conf.animate([
+                        { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                        { transform: `translateY(100vh) rotate(720deg)`, opacity: 0 }
+                    ], {
+                        duration: 3000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+                    
+                    anim.onfinish = () => conf.remove();
+                }, i * 30);
+            }
+        }
+
+        // Инициализация
+        window.onload = () => {
+            createParticles();
+        };
+    </script>
+</body>
+</html>
